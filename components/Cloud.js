@@ -103,11 +103,11 @@ export default class Cloud extends React.Component {
   }
 
   _computeWeights = (words, frequencies) => {
-    return computeTopNWeights(words, frequencies, 3, 25);
+    return computeTopNWeights(words, frequencies, 5, 20);
   }
 
   _computeFontSize = (word, weight) => {
-    const minFontSize = 12, maxFontSize = 72;
+    const minFontSize = 6, maxFontSize = 64;
     return minFontSize + ((maxFontSize - minFontSize) * weight);
   }
 
@@ -115,7 +115,7 @@ export default class Cloud extends React.Component {
     // compute width, height of proposed word
     // TODO: measure this for realz
     const fontSize = this._computeFontSize(word, weight);
-    const width = word.length * fontSize * 0.6, height = fontSize * 1.8;
+    const width = word.length * fontSize * 0.6, height = fontSize * 1.2;
 
     if (!existingBoxes || existingBoxes.length == 0) {
       // base case: center on screen
@@ -132,12 +132,23 @@ export default class Cloud extends React.Component {
         // randomly pick something adjacent to an existing bounding box
         const randomExistingBox = existingBoxes[Math.floor(Math.random() * existingBoxes.length)];
         candidateBox = this._computeRandomAdjacentBox(randomExistingBox, width, height);
-        if (!this._boxIntersectsBoxes(candidateBox, existingBoxes)) {
+        if (!this._boxIntersectsBoxes(candidateBox, existingBoxes) &&
+            !this._boxIsOutsideBounds(candidateBox)) {
           return candidateBox;
         }
       }
+      console.log('exceeded max num tries for word', word);
       return candidateBox;
     }
+  }
+
+  _boxIsOutsideBounds = (candidateBox) => {
+    const buffer = 32;
+    if (candidateBox.x < -buffer) return true;
+    if (candidateBox.x + candidateBox.width > this.props.width + buffer) return true;
+    if (candidateBox.y < -buffer) return true;
+    if (candidateBox.y + candidateBox.height > this.props.height + buffer) return true;
+    return false;
   }
 
   _boxIntersectsBoxes = (candidateBox, existingBoxes) => {
@@ -159,26 +170,27 @@ export default class Cloud extends React.Component {
   _getMinMaxVectors = (box) => {
     return {
       min: { x: box.x, y: box.y },
-      max: { x: box.x + box.width, y: box.x + box.height },
+      max: { x: box.x + box.width, y: box.y + box.height },
     };
   }
 
   _computeRandomAdjacentBox = (existingBox, width, height) => {
     // any side will do!
     const side = Math.floor(Math.random() * 4);
+    const buffer = 0.1;
     switch (side) {
     case 0:
       // left
-      return { x: existingBox.x - width, y: existingBox.y, width, height };
-    case 1:
+      return { x: existingBox.x - width - buffer, y: existingBox.y, width, height };
+     case 1:
       // top
-      return { x: existingBox.x, y: existingBox.y - height, width, height };
+      return { x: existingBox.x, y: existingBox.y - height - buffer, width, height };
     case 2:
       // right
-      return { x: existingBox.x + existingBox.width, y: existingBox.y, width, height };
+      return { x: existingBox.x + existingBox.width + buffer, y: existingBox.y, width, height };
     case 3:
       // bottom
-      return { x: existingBox.x + existingBox.height, y: existingBox.y, width, height };
+      return { x: existingBox.x, y: existingBox.y + existingBox.height + buffer, width, height };
     }
     return existingBox;
   }
@@ -190,6 +202,6 @@ const styles = StyleSheet.create({
   },
   word: {
     position: 'absolute',
-    backgroundColor: '#ff0000',
+    backgroundColor: 'transparent',
   }
 });
