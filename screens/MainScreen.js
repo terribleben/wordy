@@ -57,12 +57,10 @@ export default class MainScreen extends React.Component {
 
       let words = {};
       Object.keys(rawWords).forEach((word) => {
-        if (rawWords[word] > 100) {
+        if (rawWords[word] > 2) {
           words[word] = rawWords[word];
         }
       });
-
-      console.log('filtered words:', words);
       this.setState({ words });
     } catch (e) {
       console.log('hay', e);
@@ -80,7 +78,6 @@ export default class MainScreen extends React.Component {
     const response = await fetch(url, {
       method: 'get',
     });
-    // console.log('yooo', response);
     if (response.status >= 400 && response.status < 600) {
       console.log('bad', response.status);
       return;

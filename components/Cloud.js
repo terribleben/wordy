@@ -6,6 +6,11 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import {
+  computeLinearWeights,
+  computeTopNWeights,
+} from '../util/Weights';
+
 export default class Cloud extends React.Component {
   _mounted = false;
   state = {
@@ -42,7 +47,10 @@ export default class Cloud extends React.Component {
               { width, height }
             ]}>
         {Object.keys(words).map((word) => {
-          const cloudStyles = (cloudData[word]) ? cloudData[word] : {};
+          if (!cloudData[word]) {
+            return null;
+          }
+          const cloudStyles = cloudData[word];
           return (
             <Text
               style={[styles.word, cloudStyles]}
@@ -73,6 +81,10 @@ export default class Cloud extends React.Component {
     // compute styles
     let bounds = [];
     words.forEach((word) => {
+      if (!weights[word]) {
+        // zero weight or we decided to omit it from the cloud, continue
+        return;
+      }
       const box = this._computeBoundingBox(word, weights[word], bounds);
       bounds.push(box);
       let data = {
@@ -88,15 +100,7 @@ export default class Cloud extends React.Component {
   }
 
   _computeWeights = (words, frequencies) => {
-    let totalValue = 0;
-    let weights = {};
-    words.forEach((word) => {
-      totalValue += frequencies[word];
-    });
-    words.forEach((word) => {
-      weights[word] = frequencies[word] / totalValue;
-    });
-    return weights;
+    return computeTopNWeights(words, frequencies, 3, 25);
   }
 
   _computeFontSize = (word, weight) => {
