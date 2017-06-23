@@ -19,7 +19,10 @@ export default class Cloud extends React.Component {
 
   componentDidMount() {
     this._mounted = true;
-    this._resetAsync();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this._resetAsync(nextProps.words);
   }
 
   render () {
@@ -52,9 +55,9 @@ export default class Cloud extends React.Component {
     );
   }
 
-  _resetAsync = async () => {
+  _resetAsync = async (words) => {
     this.setState({ loading: true });
-    await this._computeCloudAsync(this.props.words);
+    await this._computeCloudAsync(words);
     if (this._mounted) {
       this.setState({ loading: false });
     }
@@ -65,14 +68,7 @@ export default class Cloud extends React.Component {
     let words = Object.keys(wordsMapping);
 
     // compute weights
-    let totalValue = 0;
-    let weights = {};
-    words.forEach((word) => {
-      totalValue += wordsMapping[word];
-    });
-    words.forEach((word) => {
-      weights[word] = wordsMapping[word] / totalValue;
-    });
+    let weights = this._computeWeights(words, wordsMapping);
 
     // compute styles
     let bounds = [];
@@ -89,6 +85,18 @@ export default class Cloud extends React.Component {
     
     this.setState({ cloud });
     return;
+  }
+
+  _computeWeights = (words, frequencies) => {
+    let totalValue = 0;
+    let weights = {};
+    words.forEach((word) => {
+      totalValue += frequencies[word];
+    });
+    words.forEach((word) => {
+      weights[word] = frequencies[word] / totalValue;
+    });
+    return weights;
   }
 
   _computeFontSize = (word, weight) => {
