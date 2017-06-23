@@ -5,28 +5,38 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import { AppLoading } from 'expo';
+
 import Cloud from '../components/Cloud';
 import StopWords from '../util/StopWords';
+
+const BOOKS = {
+  metamorphosis: 'http://www.gutenberg.org/cache/epub/5200/pg5200.txt',
+  prideandprejudice: 'http://www.gutenberg.org/files/1342/1342-0.txt',
+};
 
 export default class MainScreen extends React.Component {
   state = {
     words: {},
-    /* words: {
-      'hello': 100,
-      'world': 50,
-      'this': 10,
-      'is': 1,
-      'ben': 10,
-    }, */
+    isLoading: true,
   };
 
   STOP_WORDS = [];
+  _mounted = false;
 
   componentDidMount() {
-    this._makeWordsFromWebsiteAsync('http://www.gutenberg.org/files/1342/1342-0.txt');
+    this._mounted = true;
+    this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
+  }
+
+  componentWillUnmount() {
+    this._mounted = false;
   }
   
   render() {
+    if (this.state.isLoading) {
+      return (<AppLoading />);
+    }
     return (
       <View style={styles.cloudContainer}>
         <Cloud
@@ -38,13 +48,14 @@ export default class MainScreen extends React.Component {
   }
 
   _makeWordsFromWebsiteAsync = async (url) => {
+    let words = {};
     try {
       const text = await this._getWebsiteAsync(url);
       const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
       const allTokens = cleanText.split(' ');
       let rawWords = {};
       allTokens.forEach((token) => {
-        token = token.trim().toLowerCase();
+        token = token.trim().toLowerCase().replace(/\W/g, '');
         if (this._isStopWord(token)) {
           return;
         }
@@ -55,15 +66,16 @@ export default class MainScreen extends React.Component {
         }
       });
 
-      let words = {};
       Object.keys(rawWords).forEach((word) => {
         if (rawWords[word] > 2) {
           words[word] = rawWords[word];
         }
       });
-      this.setState({ words });
     } catch (e) {
       console.log('hay', e);
+    }
+    if (this._mounted) {
+      this.setState({ isLoading: false, words });
     }
   }
 

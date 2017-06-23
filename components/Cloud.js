@@ -15,7 +15,7 @@ export default class Cloud extends React.Component {
   _mounted = false;
   state = {
     cloud: {},
-    loading: false,
+    loading: true,
   };
 
   componentWillUnmount() {
@@ -24,6 +24,7 @@ export default class Cloud extends React.Component {
 
   componentDidMount() {
     this._mounted = true;
+    this._resetAsync(this.props.words);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -64,7 +65,9 @@ export default class Cloud extends React.Component {
   }
 
   _resetAsync = async (words) => {
-    this.setState({ loading: true });
+    if (this._mounted) {
+      this.setState({ loading: true });
+    }
     await this._computeCloudAsync(words);
     if (this._mounted) {
       this.setState({ loading: false });

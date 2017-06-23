@@ -171,4 +171,8 @@ your
 yours
 yourself
 yourselves
+gutenberg
+gutenbergtm
+ebook
+license
 `;
