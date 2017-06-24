@@ -37,7 +37,9 @@ export default class MainScreen extends React.Component {
   render() {
     if (this.state.isLoading) {
       return (
-        <ActivityIndicator loading={true} />
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator loading={true} />
+        </View>
       );
     }
     return (
@@ -77,10 +79,17 @@ export default class MainScreen extends React.Component {
 }
 
 const styles = StyleSheet.create({
-  cloudContainer: {
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
     backgroundColor: '#ffffff',
-    width: Dimensions.get('window').width,
-    height: Dimensions.get('window').height,
+  },
+  cloudContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#ffffff',
   },
   button: {
     position: 'absolute',
