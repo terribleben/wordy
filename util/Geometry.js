@@ -39,19 +39,24 @@ function computeRandomAdjacentBox(existingBox, width, height) {
   // any side will do!
   const side = Math.floor(Math.random() * 4);
   const buffer = 0.1;
+  const offsetRand = Math.random();
+  const centerOffset = {
+    x: existingBox.width * offsetRand - width * 0.5,
+    y: existingBox.height * offsetRand - height * 0.5,
+  }
   switch (side) {
   case 0:
     // left
-    return { x: existingBox.x - width - buffer, y: existingBox.y, width, height };
+    return { x: existingBox.x - width - buffer, y: existingBox.y + centerOffset.y, width, height };
   case 1:
     // top
-    return { x: existingBox.x, y: existingBox.y - height - buffer, width, height };
+    return { x: existingBox.x + centerOffset.x, y: existingBox.y - height - buffer, width, height };
   case 2:
     // right
-    return { x: existingBox.x + existingBox.width + buffer, y: existingBox.y, width, height };
+    return { x: existingBox.x + existingBox.width + buffer, y: existingBox.y + centerOffset.y, width, height };
   case 3:
     // bottom
-    return { x: existingBox.x, y: existingBox.y + existingBox.height + buffer, width, height };
+    return { x: existingBox.x + centerOffset.x, y: existingBox.y + existingBox.height + buffer, width, height };
   }
   return existingBox;
 }

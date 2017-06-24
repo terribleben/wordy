@@ -11,7 +11,8 @@
   "loading": {
     "icon": "./assets/icons/loading.png",
     "backgroundColor": "#0094cd",
-    "hideExponentText": true
+    "hideExponentText": true,
+    "loadingIndicatorStyleExperimental": "light"
   },
   "packagerOpts": {
     "assetExts": ["ttf"]
