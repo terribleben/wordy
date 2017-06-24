@@ -1,13 +1,12 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   View,
   StyleSheet,
   Text,
   TouchableOpacity,
 } from 'react-native';
-
-import { AppLoading } from 'expo';
 
 import Cloud from '../components/Cloud';
 import StopWords from '../util/StopWords';
@@ -37,7 +36,9 @@ export default class MainScreen extends React.Component {
   
   render() {
     if (this.state.isLoading) {
-      return (<AppLoading />);
+      return (
+        <ActivityIndicator loading={true} />
+      );
     }
     return (
       <View style={styles.cloudContainer}>
@@ -59,6 +60,9 @@ export default class MainScreen extends React.Component {
   }
 
   _makeWordsFromWebsiteAsync = async (url) => {
+    if (this._mounted) {
+      this.setState({ isLoading: true });
+    }
     let words = {};
     try {
       const text = await this._getWebsiteAsync(url);

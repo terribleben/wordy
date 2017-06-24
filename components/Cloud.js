@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  ActivityIndicator,
   Dimensions,
   View,
   StyleSheet,
@@ -40,7 +41,7 @@ export default class Cloud extends React.Component {
   render () {
     let { loading } = this.state;
     if (loading) {
-      return (<View />);
+      return (<ActivityIndicator loading={true} />);
     } else {
       return this._renderWords(this.props.words, this.state.cloud);
     }

@@ -4,16 +4,17 @@
   "slug": "wordy",
   "privacy": "public",
   "sdkVersion": "17.0.0",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "orientation": "portrait",
-  "primaryColor": "#cccccc",
+  "primaryColor": "#0094cd",
   "icon": "./assets/icons/app.png",
   "loading": {
     "icon": "./assets/icons/loading.png",
-    "hideExponentText": false
+    "backgroundColor": "#0094cd",
+    "hideExponentText": true
   },
   "packagerOpts": {
-    "assetExts": ["ttf", "mp4"]
+    "assetExts": ["ttf"]
   },
   "ios": {
     "supportsTablet": true
