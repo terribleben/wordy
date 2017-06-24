@@ -18,6 +18,7 @@ class MainScreen extends React.Component {
   state = {
     words: {},
     isLoading: true,
+    dateLastLoaded: 0,
   };
 
   _mounted = false;
@@ -49,6 +50,7 @@ class MainScreen extends React.Component {
       <View style={styles.cloudContainer}>
         <Cloud
           words={this.state.words}
+          dateLoaded={this.state.dateLastLoaded}
           width={Dimensions.get('window').width - 32}
           height={Dimensions.get('window').height - 32} />
         <SettingsButtons
@@ -60,7 +62,13 @@ class MainScreen extends React.Component {
   }
 
   _onPressReload = () => {
-    this._makeWordsFromWebsiteAsync(this.props.url);
+    if (Object.keys(this.state.words).length) {
+      // we already have a model, just regenerate the cloud
+      this.setState({ dateLastLoaded: Date.now() });
+    } else {
+      // need to download
+      this._makeWordsFromWebsiteAsync(this.props.url);
+    }
   }
 
   _onPressSettings = () => {
@@ -79,7 +87,11 @@ class MainScreen extends React.Component {
       console.log('hay', e.message);
     }
     if (this._mounted) {
-      this.setState({ isLoading: false, words });
+      this.setState({
+        isLoading: false,
+        dateLastLoaded: Date.now(),
+        words,
+      });
     }
   }
 }
