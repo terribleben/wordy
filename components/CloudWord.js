@@ -40,10 +40,9 @@ export default class CloudWord extends React.Component {
       inputRange: [0, 1],
       outputRange: [center.y - box.height * 0.5, box.y],
     });
-    const opacity = this.state.transitionIn;
     return (
       <Animated.View
-        style={{ left, top, opacity }}>
+        style={{ left, top, opacity: this.state.transitionIn }}>
         <Text
           style={[
             styles.word,

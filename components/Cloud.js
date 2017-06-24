@@ -104,9 +104,11 @@ export default class Cloud extends React.Component {
       }
       const box = this._computeBoundingBox(word, weights[word], bounds);
       bounds.push(box);
+      const color = (1.0 - weights[word]) * 128;
       let data = {
         style: {
           fontSize: this._computeFontSize(word, weights[word]),
+          color: `rgba(${color}, ${color}, ${color}, 1)`,
         },
         box,
       };
@@ -118,7 +120,7 @@ export default class Cloud extends React.Component {
   }
 
   _computeWeights = (words, frequencies) => {
-    return computeTopNWeights(words, frequencies, 8, 25);
+    return computeTopNWeights(words, frequencies, 10, 50);
   }
 
   _computeFontSize = (word, weight) => {

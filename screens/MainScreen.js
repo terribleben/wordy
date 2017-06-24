@@ -49,8 +49,8 @@ class MainScreen extends React.Component {
       <View style={styles.cloudContainer}>
         <Cloud
           words={this.state.words}
-          width={Dimensions.get('window').width}
-          height={Dimensions.get('window').height} />
+          width={Dimensions.get('window').width - 32}
+          height={Dimensions.get('window').height - 32} />
         <SettingsButtons
           style={styles.buttons}
           onPressReload={this._onPressReload}

@@ -20,7 +20,7 @@ class Analysis {
     const allTokens = cleanText.split(' ');
     let rawWords = {};
     allTokens.forEach((token) => {
-      token = token.trim().toLowerCase().replace(/\W/g, '');
+      token = token.trim().toLowerCase().replace(/[^0-9a-z\']/gi, '');
       if (this._isStopWord(token)) {
         return;
       }
