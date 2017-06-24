@@ -1,7 +1,9 @@
 import { createStore } from 'redux';
 
+import Books from '../util/Books';
+
 const initialState = {
-  url: '',
+  url: Books.metamorphosis.url,
 };
 
 const reduce = (state, action) => {

@@ -24,7 +24,7 @@ class MainScreen extends React.Component {
 
   componentDidMount() {
     this._mounted = true;
-    this._makeWordsFromWebsiteAsync(Books.metamorphosis);
+    this._makeWordsFromWebsiteAsync(this.props.url);
   }
 
   componentWillUnmount() {
