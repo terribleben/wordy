@@ -2,19 +2,20 @@ import React from 'react';
 import {
   Dimensions,
   View,
-  Text,
   StyleSheet,
 } from 'react-native';
 
-import {
-  computeTopNWeights,
-} from '../util/Weights';
+import CloudWord from './CloudWord';
 
 import {
   boxesIntersect,
   boxIntersectsBoxes,
   computeRandomAdjacentBox,
 } from '../util/Geometry';
+
+import {
+  computeTopNWeights,
+} from '../util/Weights';
 
 export default class Cloud extends React.Component {
   _mounted = false;
@@ -46,7 +47,12 @@ export default class Cloud extends React.Component {
   }
 
   _renderWords = (words, cloudData) => {
-    let { width, height } = this.props;
+    const { width, height } = this.props;
+    const center = {
+      x: (this.props.width * 0.5),
+      y: (this.props.height * 0.5),
+    };
+    let ii = 0;
     return (
       <View style={[
               styles.cloudContainer,
@@ -56,13 +62,15 @@ export default class Cloud extends React.Component {
           if (!cloudData[word]) {
             return null;
           }
-          const cloudStyles = cloudData[word];
+          ii++;
           return (
-            <Text
-              style={[styles.word, cloudStyles]}
-              key={word}>
-              {word}
-            </Text>
+            <CloudWord
+              style={cloudData[word].style}
+              box={cloudData[word].box}
+              center={center}
+              animation={{delay: ii * 5, duration: 500 + (ii * 5)}}
+              key={word}
+              value={word} />
           );
         })}
       </View>
@@ -96,9 +104,10 @@ export default class Cloud extends React.Component {
       const box = this._computeBoundingBox(word, weights[word], bounds);
       bounds.push(box);
       let data = {
-        left: box.x,
-        top: box.y,
-        fontSize: this._computeFontSize(word, weights[word]),
+        style: {
+          fontSize: this._computeFontSize(word, weights[word]),
+        },
+        box,
       };
       cloud[word] = data;
     });
@@ -160,8 +169,4 @@ const styles = StyleSheet.create({
   cloudContainer: {
     backgroundColor: '#ffffff',
   },
-  word: {
-    position: 'absolute',
-    backgroundColor: 'transparent',
-  }
 });
