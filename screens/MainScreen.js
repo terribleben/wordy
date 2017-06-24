@@ -4,13 +4,12 @@ import {
   Dimensions,
   View,
   StyleSheet,
-  Text,
-  TouchableOpacity,
 } from 'react-native';
 
 import Analysis from '../util/Analysis';
 import * as Api from '../api/Api';
 import Cloud from '../components/Cloud';
+import SettingsButtons from '../components/SettingsButtons';
 
 const BOOKS = {
   metamorphosis: 'http://www.gutenberg.org/cache/epub/5200/pg5200.txt',
@@ -48,17 +47,16 @@ export default class MainScreen extends React.Component {
           words={this.state.words}
           width={Dimensions.get('window').width}
           height={Dimensions.get('window').height} />
-        <TouchableOpacity
-          onPress={this._onPressButton}
-          style={styles.button}>
-          <Text style={styles.buttonText}>Reload</Text>
-        </TouchableOpacity>
+        <SettingsButtons
+          style={styles.buttons}
+          onPressReload={this._onPressButton} />
       </View>
     );
   }
 
   _onPressButton = () => {
     this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
+    // this.props.navigation.navigate('Settings');
   }
 
   _makeWordsFromWebsiteAsync = async (url) => {
@@ -91,17 +89,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     backgroundColor: '#ffffff',
   },
-  button: {
+  buttons: {
     position: 'absolute',
-    width: 96,
-    height: 32,
     left: 16,
     bottom: 16,
-    alignItems: 'center',
-    backgroundColor: '#dddddd',
-    borderRadius: 4,
-  },
-  buttonText: {
-    margin: 6,
   },
 });
