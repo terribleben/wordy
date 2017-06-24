@@ -3,6 +3,8 @@ import {
   Dimensions,
   View,
   StyleSheet,
+  Text,
+  TouchableOpacity,
 } from 'react-native';
 
 import { AppLoading } from 'expo';
@@ -43,8 +45,17 @@ export default class MainScreen extends React.Component {
           words={this.state.words}
           width={Dimensions.get('window').width}
           height={Dimensions.get('window').height} />
+        <TouchableOpacity
+          onPress={this._onPressButton}
+          style={styles.button}>
+          <Text style={styles.buttonText}>Reload</Text>
+        </TouchableOpacity>
       </View>
     );
+  }
+
+  _onPressButton = () => {
+    this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
   }
 
   _makeWordsFromWebsiteAsync = async (url) => {
@@ -112,5 +123,18 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     width: Dimensions.get('window').width,
     height: Dimensions.get('window').height,
+  },
+  button: {
+    position: 'absolute',
+    width: 96,
+    height: 32,
+    left: 16,
+    bottom: 16,
+    alignItems: 'center',
+    backgroundColor: '#dddddd',
+    borderRadius: 4,
+  },
+  buttonText: {
+    margin: 6,
   },
 });

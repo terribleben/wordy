@@ -103,11 +103,11 @@ export default class Cloud extends React.Component {
   }
 
   _computeWeights = (words, frequencies) => {
-    return computeTopNWeights(words, frequencies, 5, 20);
+    return computeTopNWeights(words, frequencies, 8, 25);
   }
 
   _computeFontSize = (word, weight) => {
-    const minFontSize = 6, maxFontSize = 64;
+    const minFontSize = 4, maxFontSize = 64;
     return minFontSize + ((maxFontSize - minFontSize) * weight);
   }
 
