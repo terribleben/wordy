@@ -7,9 +7,14 @@ import {
 } from 'react-native';
 
 import {
-  computeLinearWeights,
   computeTopNWeights,
 } from '../util/Weights';
+
+import {
+  boxesIntersect,
+  boxIntersectsBoxes,
+  computeRandomAdjacentBox,
+} from '../util/Geometry';
 
 export default class Cloud extends React.Component {
   _mounted = false;
@@ -131,13 +136,12 @@ export default class Cloud extends React.Component {
       while (numTries++ < maxNumTries) {
         // randomly pick something adjacent to an existing bounding box
         const randomExistingBox = existingBoxes[Math.floor(Math.random() * existingBoxes.length)];
-        candidateBox = this._computeRandomAdjacentBox(randomExistingBox, width, height);
-        if (!this._boxIntersectsBoxes(candidateBox, existingBoxes) &&
+        candidateBox = computeRandomAdjacentBox(randomExistingBox, width, height);
+        if (!boxIntersectsBoxes(candidateBox, existingBoxes) &&
             !this._boxIsOutsideBounds(candidateBox)) {
           return candidateBox;
         }
       }
-      console.log('exceeded max num tries for word', word);
       return candidateBox;
     }
   }
@@ -149,50 +153,6 @@ export default class Cloud extends React.Component {
     if (candidateBox.y < -buffer) return true;
     if (candidateBox.y + candidateBox.height > this.props.height + buffer) return true;
     return false;
-  }
-
-  _boxIntersectsBoxes = (candidateBox, existingBoxes) => {
-    if (!existingBoxes) {
-      return false;
-    }
-    const candidate = this._getMinMaxVectors(candidateBox);
-    for (let ii = 0, nn = existingBoxes.length; ii < nn; ii++) {
-      const existing = this._getMinMaxVectors(existingBoxes[ii]);
-      if (candidate.max.x < existing.min.x) continue; // a is left of b
-      if (candidate.min.x > existing.max.x) continue; // a is right of b
-      if (candidate.max.y < existing.min.y) continue; // a is above b
-      if (candidate.min.y > existing.max.y) continue; // a is below b
-      return true; // boxes overlap
-    }
-    return false;
-  }
-
-  _getMinMaxVectors = (box) => {
-    return {
-      min: { x: box.x, y: box.y },
-      max: { x: box.x + box.width, y: box.y + box.height },
-    };
-  }
-
-  _computeRandomAdjacentBox = (existingBox, width, height) => {
-    // any side will do!
-    const side = Math.floor(Math.random() * 4);
-    const buffer = 0.1;
-    switch (side) {
-    case 0:
-      // left
-      return { x: existingBox.x - width - buffer, y: existingBox.y, width, height };
-     case 1:
-      // top
-      return { x: existingBox.x, y: existingBox.y - height - buffer, width, height };
-    case 2:
-      // right
-      return { x: existingBox.x + existingBox.width + buffer, y: existingBox.y, width, height };
-    case 3:
-      // bottom
-      return { x: existingBox.x, y: existingBox.y + existingBox.height + buffer, width, height };
-    }
-    return existingBox;
   }
 }
 
