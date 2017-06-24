@@ -6,6 +6,8 @@ import {
   StyleSheet,
 } from 'react-native';
 
+import { connect } from 'react-redux';
+
 import Analysis from '../util/Analysis';
 import * as Api from '../api/Api';
 import Cloud from '../components/Cloud';
@@ -16,7 +18,7 @@ const BOOKS = {
   prideandprejudice: 'http://www.gutenberg.org/files/1342/1342-0.txt',
 };
 
-export default class MainScreen extends React.Component {
+class MainScreen extends React.Component {
   state = {
     words: {},
     isLoading: true,
@@ -31,6 +33,10 @@ export default class MainScreen extends React.Component {
 
   componentWillUnmount() {
     this._mounted = false;
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log('ben new mainscreen props', nextProps);
   }
   
   render() {
@@ -99,3 +105,5 @@ const styles = StyleSheet.create({
     bottom: 16,
   },
 });
+
+export default connect((state) => ({ url: state.url }))(MainScreen);
