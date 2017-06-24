@@ -49,14 +49,18 @@ export default class MainScreen extends React.Component {
           height={Dimensions.get('window').height} />
         <SettingsButtons
           style={styles.buttons}
-          onPressReload={this._onPressButton} />
+          onPressReload={this._onPressReload}
+          onPressSettings={this._onPressSettings} />
       </View>
     );
   }
 
-  _onPressButton = () => {
+  _onPressReload = () => {
     this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
-    // this.props.navigation.navigate('Settings');
+  }
+
+  _onPressSettings = () => {
+    this.props.navigation.navigate('Settings');
   }
 
   _makeWordsFromWebsiteAsync = async (url) => {
