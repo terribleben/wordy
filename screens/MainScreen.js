@@ -10,13 +10,9 @@ import { connect } from 'react-redux';
 
 import Analysis from '../util/Analysis';
 import * as Api from '../api/Api';
+import Books from '../util/Books';
 import Cloud from '../components/Cloud';
 import SettingsButtons from '../components/SettingsButtons';
-
-const BOOKS = {
-  metamorphosis: 'http://www.gutenberg.org/cache/epub/5200/pg5200.txt',
-  prideandprejudice: 'http://www.gutenberg.org/files/1342/1342-0.txt',
-};
 
 class MainScreen extends React.Component {
   state = {
@@ -28,7 +24,7 @@ class MainScreen extends React.Component {
 
   componentDidMount() {
     this._mounted = true;
-    this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
+    this._makeWordsFromWebsiteAsync(Books.metamorphosis);
   }
 
   componentWillUnmount() {
@@ -36,7 +32,9 @@ class MainScreen extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    console.log('ben new mainscreen props', nextProps);
+    if (nextProps.url !== this.props.url) {
+      this._makeWordsFromWebsiteAsync(nextProps.url);
+    }
   }
   
   render() {
@@ -62,7 +60,7 @@ class MainScreen extends React.Component {
   }
 
   _onPressReload = () => {
-    this._makeWordsFromWebsiteAsync(BOOKS.metamorphosis);
+    this._makeWordsFromWebsiteAsync(this.props.url);
   }
 
   _onPressSettings = () => {

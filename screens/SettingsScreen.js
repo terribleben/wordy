@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import Books from '../util/Books';
 import Store from '../redux/Store';
 
 export default class SettingsScreen extends React.Component {
@@ -17,13 +18,14 @@ export default class SettingsScreen extends React.Component {
               backgroundColor: 'white',
             }}>
         <TouchableOpacity onPress={this._onPressButton}>
-          <Text>Clck me</Text>
+          <Text>Pride and Prejudice instead</Text>
         </TouchableOpacity>
       </View>
     );
   }
 
   _onPressButton = () => {
-    Store.dispatch({ type: 'UPDATE_SETTINGS' });
+    Store.dispatch({ type: 'UPDATE_SETTINGS', url: Books.prideandprejudice });
+    this.props.navigation.goBack();
   }
 }

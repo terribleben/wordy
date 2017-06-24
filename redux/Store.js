@@ -1,7 +1,7 @@
 import { createStore } from 'redux';
 
 const initialState = {
-  url: 'http://dumb',
+  url: '',
 };
 
 const reduce = (state, action) => {
@@ -9,7 +9,7 @@ const reduce = (state, action) => {
   case 'UPDATE_SETTINGS':
     return {
       ...state,
-      url: 'http://yooooo',
+      url: action.url,
     }
   default:
     return state;

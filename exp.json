@@ -1,10 +1,10 @@
 {
   "name": "wordy",
-  "description": "Computes word clouds!",
+  "description": "Wordy computes word clouds! https://github.com/terribleben/wordy",
   "slug": "wordy",
   "privacy": "public",
   "sdkVersion": "17.0.0",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "orientation": "portrait",
   "primaryColor": "#0094cd",
   "icon": "./assets/icons/app.png",
