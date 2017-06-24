@@ -143,7 +143,7 @@ export default class Cloud extends React.Component {
   }
 
   _boxIsOutsideBounds = (candidateBox) => {
-    const buffer = 32;
+    const buffer = 0;
     if (candidateBox.x < -buffer) return true;
     if (candidateBox.x + candidateBox.width > this.props.width + buffer) return true;
     if (candidateBox.y < -buffer) return true;

@@ -1,6 +1,6 @@
 {
   "name": "wordy",
-  "description": "An empty new project",
+  "description": "Computes word clouds!",
   "slug": "wordy",
   "privacy": "public",
   "sdkVersion": "17.0.0",
