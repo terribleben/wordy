@@ -4,6 +4,7 @@ import {
   Easing,
   Text,
   StyleSheet,
+  View,
 } from 'react-native';
 
 export default class CloudWord extends React.Component {
@@ -40,9 +41,10 @@ export default class CloudWord extends React.Component {
       inputRange: [0, 1],
       outputRange: [center.y - box.height * 0.5, box.y],
     });
+    const opacity = this.state.transitionIn;
     return (
       <Animated.View
-        style={{ left, top, opacity: this.state.transitionIn }}>
+        style={{ position: 'absolute', left, top, opacity }}>
         <Text
           style={[
             styles.word,
@@ -57,7 +59,6 @@ export default class CloudWord extends React.Component {
 
 const styles = StyleSheet.create({
   word: {
-    position: 'absolute',
     backgroundColor: 'transparent',
   },
 });
