@@ -8,8 +8,9 @@ import {
   TouchableOpacity,
 } from 'react-native';
 
+import Analysis from '../util/Analysis';
+import * as Api from '../api/Api';
 import Cloud from '../components/Cloud';
-import StopWords from '../util/StopWords';
 
 const BOOKS = {
   metamorphosis: 'http://www.gutenberg.org/cache/epub/5200/pg5200.txt',
@@ -22,7 +23,6 @@ export default class MainScreen extends React.Component {
     isLoading: true,
   };
 
-  STOP_WORDS = [];
   _mounted = false;
 
   componentDidMount() {
@@ -65,60 +65,14 @@ export default class MainScreen extends React.Component {
     }
     let words = {};
     try {
-      const text = await this._getWebsiteAsync(url);
-      const cleanText = text.replace(/<\/?[^>]+(>|$)/g, "");
-      const allTokens = cleanText.split(' ');
-      let rawWords = {};
-      allTokens.forEach((token) => {
-        token = token.trim().toLowerCase().replace(/\W/g, '');
-        if (this._isStopWord(token)) {
-          return;
-        }
-        if (rawWords[token]) {
-          rawWords[token]++;
-        } else {
-          rawWords[token] = 1;
-        }
-      });
-
-      Object.keys(rawWords).forEach((word) => {
-        if (rawWords[word] > 2) {
-          words[word] = rawWords[word];
-        }
-      });
+      const text = await Api.getWebsiteAsync(url);
+      words = Analysis.getWordFrequencies(text);
     } catch (e) {
-      console.log('hay', e);
+      console.log('hay', e.message);
     }
     if (this._mounted) {
       this.setState({ isLoading: false, words });
     }
-  }
-
-  _isStopWord = (token) => {
-    if (!this.STOP_WORDS.length) {
-      this.STOP_WORDS = StopWords.split('\n');
-    }
-    return this.STOP_WORDS.indexOf(token) > -1;
-  }
-
-  _getWebsiteAsync = async (url) => {
-    const response = await fetch(url, {
-      method: 'get',
-    });
-    if (response.status >= 400 && response.status < 600) {
-      console.log('bad', response.status);
-      return;
-    }
-
-    let text;
-    let contentType = response.headers.get('Content-Type');
-    if (contentType && contentType.indexOf('text') !== -1) {
-      text = await response.text();
-    } else {
-      console.log('nope', contentType);
-    }
-
-    return text;
   }
 }
 
