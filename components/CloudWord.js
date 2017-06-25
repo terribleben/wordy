@@ -41,10 +41,20 @@ export default class CloudWord extends React.Component {
       inputRange: [0, 1],
       outputRange: [center.y - box.height * 0.5, box.y],
     });
+    const scale = this.state.transitionIn.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0.5, 1],
+    });
     const opacity = this.state.transitionIn;
     return (
       <Animated.View
-        style={{ position: 'absolute', left, top, opacity }}>
+        style={{
+          position: 'absolute',
+          left,
+          top,
+          transform: [{ scale }],
+          opacity
+        }}>
         <Text
           style={[
             styles.word,
