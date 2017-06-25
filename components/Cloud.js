@@ -131,11 +131,36 @@ export default class Cloud extends React.Component {
     return minFontSize + ((maxFontSize - minFontSize) * weight);
   }
 
+  // TODO: un-hack plz
+  _computeFakeWordDimensions = (word, fontSize) => {
+    // const width = word.length * fontSize * 0.6, height = fontSize * 1.2;
+    const height = fontSize * 1.2;
+    let width = 0;
+    const fakeCharWidths = {
+      f: 0.4,
+      i: 0.3,
+      l: 0.3,
+      m: 1.0,
+      r: 0.4,
+      t: 0.4,
+      w: 1.0,
+      "'": 0.3,
+      default: 0.6,
+    };
+    for (let ii = 0, nn = word.length; ii < nn; ii++) {
+      const char = word.charAt(ii);
+      const charWidth = (fakeCharWidths.hasOwnProperty(char))
+            ? fakeCharWidths[char]
+            : fakeCharWidths.default;
+      width += charWidth * fontSize;
+    }
+    return { width, height };
+  }
+
   _computeBoundingBox = (word, weight, existingBoxes) => {
     // compute width, height of proposed word
-    // TODO: measure this for realz
     const fontSize = this._computeFontSize(word, weight);
-    const width = word.length * fontSize * 0.6, height = fontSize * 1.2;
+    const { width, height } = this._computeFakeWordDimensions(word, fontSize);
 
     if (!existingBoxes || existingBoxes.length == 0) {
       // base case: center on screen
