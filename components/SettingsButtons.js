@@ -7,6 +7,8 @@ import {
 
 import { Ionicons } from '@expo/vector-icons';
 
+import { Palette } from '../util/Colors';
+
 export default class SettingsButtons extends React.Component {
   render() {
     return (
@@ -43,7 +45,7 @@ const styles = StyleSheet.create({
     height: 36,
     borderRadius: 4,
     alignItems: 'center',
-    backgroundColor: '#0094cd',
+    backgroundColor: Palette.blue,
     marginRight: 4,
   },
   reloadIcon: {

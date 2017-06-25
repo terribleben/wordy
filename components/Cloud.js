@@ -7,6 +7,7 @@ import {
 } from 'react-native';
 
 import CloudWord from './CloudWord';
+import * as Colors from '../util/Colors';
 
 import {
   boxesIntersect,
@@ -97,6 +98,8 @@ export default class Cloud extends React.Component {
 
     // compute styles
     let bounds = [];
+    const weakColor = { r: 128, g: 128, b: 128, a: 1.0 },
+      strongColor = { r: 0, g: 0, b: 0, a: 1.0 };
     words.forEach((word) => {
       if (!weights[word]) {
         // zero weight or we decided to omit it from the cloud, continue
@@ -104,11 +107,11 @@ export default class Cloud extends React.Component {
       }
       const box = this._computeBoundingBox(word, weights[word], bounds);
       bounds.push(box);
-      const color = (1.0 - weights[word]) * 128;
+      const color = Colors.interp(weakColor, strongColor, weights[word]);
       let data = {
         style: {
           fontSize: this._computeFontSize(word, weights[word]),
-          color: `rgba(${color}, ${color}, ${color}, 1)`,
+          color: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
         },
         box,
       };

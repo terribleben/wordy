@@ -10,6 +10,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { connect } from 'react-redux';
 
 import Books from '../util/Books';
+import { Palette } from '../util/Colors';
 import Store from '../redux/Store';
 
 class SettingsScreen extends React.Component {
@@ -70,7 +71,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#0094cd',
+    color: Palette.blue,
     paddingLeft: 16,
     marginBottom: 16,
   },
@@ -90,7 +91,7 @@ const styles = StyleSheet.create({
     right: 0,
     top: 6,
     justifyContent: 'center',
-    color: '#0094cd',
+    color: Palette.blue,
   },
 });
 
