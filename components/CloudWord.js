@@ -32,18 +32,25 @@ export default class CloudWord extends React.Component {
   }
   
   render() {
-    const { center, box } = this.props;
+    const { center, box, scale } = this.props;
+    
+    // vector from [center to box.origin]
+    // scaled * scale
+    // vector from screen origin to there
+    const scaledBoxFromCenter = {
+      x: ((box.x - center.x) * scale) + center.x,
+      y: ((box.y - center.y) * scale) + center.y,
+      width: box.width * scale,
+      height: box.height * scale,
+    };
+    
     const left = this.state.transitionIn.interpolate({
       inputRange: [0, 1],
-      outputRange: [center.x - box.width * 0.5, box.x],
+      outputRange: [center.x - scaledBoxFromCenter.width * 0.5, scaledBoxFromCenter.x],
     });
     const top = this.state.transitionIn.interpolate({
       inputRange: [0, 1],
-      outputRange: [center.y - box.height * 0.5, box.y],
-    });
-    const scale = this.state.transitionIn.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.5, 1],
+      outputRange: [center.y - scaledBoxFromCenter.height * 0.5, scaledBoxFromCenter.y],
     });
     const opacity = this.state.transitionIn;
     return (
@@ -52,13 +59,13 @@ export default class CloudWord extends React.Component {
           position: 'absolute',
           left,
           top,
-          transform: [{ scale }],
           opacity
         }}>
         <Text
           style={[
             styles.word,
             this.props.style,
+            { fontSize: this.props.style.fontSize * scale },
           ]}>
           {this.props.value}
         </Text>

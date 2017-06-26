@@ -68,7 +68,7 @@ export default class Cloud extends React.Component {
       <View
         style={[
           styles.cloudContainer,
-          { width, height, transform: [{ scale: this.state.scale }] }
+          { width, height }
         ]}
         {...responders}>
         {Object.keys(words).map((word) => {
@@ -81,6 +81,7 @@ export default class Cloud extends React.Component {
               style={cloudData[word].style}
               box={cloudData[word].box}
               center={center}
+              scale={this.state.scale}
               animation={{delay: ii * 5, duration: 500 + (ii * 5)}}
               key={word}
               value={word} />
