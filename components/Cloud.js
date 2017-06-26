@@ -41,7 +41,9 @@ export default class Cloud extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    this._resetAsync(nextProps.words);
+    if (nextProps.dateLoaded !== this.props.dateLoaded) {
+      this._resetAsync(nextProps.words);
+    }
   }
 
   render() {
@@ -235,6 +237,8 @@ export default class Cloud extends React.Component {
     let touches = nativeEvent ? nativeEvent.touches : null;
 
     if (touches && touches.length) {
+      let newState = {};
+      
       const isPanGestureStart = !this._hasTouch;
       this._hasTouch = true;
       let touchA = touches[0], touchB = null;
@@ -242,11 +246,17 @@ export default class Cloud extends React.Component {
         const isPinchGestureStart = !this._hasDoubleTouch;
         touchB = touches[1];
         this._hasDoubleTouch = true;
-        this._handlePinchZoom(touchA, touchB, isPinchGestureStart);
+        const newScale = this._handlePinchZoom(touchA, touchB, isPinchGestureStart);
+        if (newScale) {
+          newState.scale = newScale;
+        }
       } else {
         this._hasDoubleTouch = false;
       }
-      this._handlePan(touchA, touchB, isPanGestureStart);
+      newState.pan = this._handlePan(touchA, touchB, isPanGestureStart);
+      if (newState.pan || newState.scale) {
+        this.setState(newState);
+      }
     }
   }
 
@@ -265,12 +275,10 @@ export default class Cloud extends React.Component {
         x: center.x - this._initialPanGestureLocation.x,
         y: center.y - this._initialPanGestureLocation.y,
       };
-      this.setState({
-        pan: {
-          x: this._initialPan.x + delta.x,
-          y: this._initialPan.y + delta.y,
-        }
-      });
+      return {
+        x: this._initialPan.x + delta.x,
+        y: this._initialPan.y + delta.y,
+      }
     }
   }
 
@@ -283,9 +291,7 @@ export default class Cloud extends React.Component {
     } else {
       const pinchRatio = distanceAB / this._initialGestureDistance;
       const newScale = Math.max(Constants.CLOUD_SCALE_MIN, Math.min(Constants.CLOUD_SCALE_MAX, pinchRatio * this._initialGestureScale));
-      if (newScale) {
-        this.setState({ scale: newScale });
-      }
+      return newScale;
     }
   }
 
