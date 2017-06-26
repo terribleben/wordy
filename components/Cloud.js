@@ -26,7 +26,7 @@ export default class Cloud extends React.Component {
   state = {
     cloud: {},
     loading: true,
-    scale: 1.0,
+    scale: 0.7,
   };
 
   componentWillUnmount() {

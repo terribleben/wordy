@@ -7,6 +7,9 @@ import {
   View,
 } from 'react-native';
 
+const FONT_ALMOST_TOO_SMALL = 8.0;
+const FONT_TOO_SMALL = 6.0;
+
 export default class CloudWord extends React.Component {
   state = {
     transitionIn: new Animated.Value(0),
@@ -52,20 +55,34 @@ export default class CloudWord extends React.Component {
       inputRange: [0, 1],
       outputRange: [center.y - scaledBoxFromCenter.height * 0.5, scaledBoxFromCenter.y],
     });
-    const opacity = this.state.transitionIn;
+
+    // disappear if too small
+    let maxOpacity = 1.0;
+    const scaledFontSize = this.props.style.fontSize * scale;
+    if (scaledFontSize <= FONT_TOO_SMALL) {
+      return null;
+    } else if (scaledFontSize <= FONT_ALMOST_TOO_SMALL) {
+      // nearly too small, fade out
+      maxOpacity = (scaledFontSize - FONT_TOO_SMALL) / (FONT_ALMOST_TOO_SMALL - FONT_TOO_SMALL);
+    }
+    const opacity = this.state.transitionIn.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, maxOpacity],
+    });
+    
     return (
       <Animated.View
         style={{
           position: 'absolute',
           left,
           top,
-          opacity
+          opacity,
         }}>
         <Text
           style={[
             styles.word,
             this.props.style,
-            { fontSize: this.props.style.fontSize * scale },
+            { fontSize: scaledFontSize },
           ]}>
           {this.props.value}
         </Text>
