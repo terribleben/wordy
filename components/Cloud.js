@@ -12,7 +12,6 @@ import Constants from '../util/Constants';
 import * as Colors from '../util/Colors';
 
 import {
-  distance,
   boxesIntersect,
   boxIntersectsBoxes,
   computeRandomAdjacentBox,
@@ -27,8 +26,6 @@ export default class Cloud extends React.Component {
   state = {
     cloud: {},
     loading: true,
-    scale: Constants.CLOUD_INITIAL_SCALE,
-    pan: { x: 0, y: 0 },
   };
 
   componentWillUnmount() {
@@ -61,20 +58,16 @@ export default class Cloud extends React.Component {
       x: (this.props.width * 0.5),
       y: (this.props.height * 0.5),
     };
-    const responders = {
-      onStartShouldSetResponder: this._onContainerStartShouldSetResponder,
-      onResponderGrant: this._onContainerResponderGrant,
-      onResponderMove: this._onContainerResponderMove,
-      onResponderRelease: this._onContainerResponderRelease,
-    };
     let ii = 0;
+    /* const rasterProps = (Platform.OS === 'ios')
+          ? { shouldRasterizeIOS: true }
+          : { renderToHardwareTextureAndroid: true }; */
     return (
       <View
         style={[
           styles.cloudContainer,
           { width, height },
-        ]}
-        {...responders}>
+        ]}>
         {Object.keys(words).map((word) => {
           if (!cloudData[word]) {
             return null;
@@ -85,8 +78,8 @@ export default class Cloud extends React.Component {
               style={cloudData[word].style}
               box={cloudData[word].box}
               center={center}
-              scale={this.state.scale}
-              pan={this.state.pan}
+              scale={this.props.scale}
+              pan={this.props.pan}
               animation={{delay: ii * 5, duration: 500 + (ii * 5)}}
               key={word}
               value={word} />
@@ -102,11 +95,7 @@ export default class Cloud extends React.Component {
     }
     await this._computeCloudAsync(words);
     if (this._mounted) {
-      this.setState({
-        scale: Constants.CLOUD_INITIAL_SCALE,
-        pan: { x: 0, y: 0 },
-        loading: false,
-      });
+      this.setState({ loading: false });
     }
   }
 
@@ -214,93 +203,6 @@ export default class Cloud extends React.Component {
     if (candidateBox.y < -buffer) return true;
     if (candidateBox.y + candidateBox.height > this.props.height + buffer) return true;
     return false;
-  }
-
-  /* gesture responders */
-
-  _onContainerStartShouldSetResponder = () => true;
-
-  _onContainerResponderGrant = (event) => {
-    this._handleTouch(event);
-  }
-
-  _onContainerResponderMove = (event) => {
-    this._handleTouch(event);
-  }
-
-  _onContainerResponderRelease = (event) => {
-    this._handleRelease(event);
-  }
-
-  _handleTouch = (event) => {
-    let { nativeEvent } = event;
-    let touches = nativeEvent ? nativeEvent.touches : null;
-
-    if (touches && touches.length) {
-      let newState = {};
-      
-      const isPanGestureStart = !this._hasTouch;
-      this._hasTouch = true;
-      let touchA = touches[0], touchB = null;
-      if (touches.length === 2) {
-        const isPinchGestureStart = !this._hasDoubleTouch;
-        touchB = touches[1];
-        this._hasDoubleTouch = true;
-        const newScale = this._handlePinchZoom(touchA, touchB, isPinchGestureStart);
-        if (newScale) {
-          newState.scale = newScale;
-        }
-      } else {
-        this._hasDoubleTouch = false;
-      }
-      newState.pan = this._handlePan(touchA, touchB, isPanGestureStart);
-      if (newState.pan || newState.scale) {
-        this.setState(newState);
-      }
-    }
-  }
-
-  _handleRelease = (event) => {
-    this._hasTouch = false;
-    this._hasDoubleTouch = false;
-  }
-
-  _handlePan = (touchA, maybeTouchB, isGestureStart) => {
-    const center = this._touchLocation(touchA);
-    if (isGestureStart) {
-      this._initialPanGestureLocation = center;
-      this._initialPan = this.state.pan;
-    } else {
-      const delta = {
-        x: center.x - this._initialPanGestureLocation.x,
-        y: center.y - this._initialPanGestureLocation.y,
-      };
-      return {
-        x: this._initialPan.x + delta.x,
-        y: this._initialPan.y + delta.y,
-      }
-    }
-  }
-
-  _handlePinchZoom = (touchA, touchB, isGestureStart) => {
-    const locA = this._touchLocation(touchA), locB = this._touchLocation(touchB);
-    const distanceAB = distance(locA, locB);
-    if (isGestureStart) {
-      this._initialGestureDistance = distanceAB;
-      this._initialGestureScale = this.state.scale;
-    } else {
-      const pinchRatio = distanceAB / this._initialGestureDistance;
-      const newScale = Math.max(Constants.CLOUD_SCALE_MIN, Math.min(Constants.CLOUD_SCALE_MAX, pinchRatio * this._initialGestureScale));
-      return newScale;
-    }
-  }
-
-  _touchLocation = (touch) => {
-    // use pageX rather than locationX because we are scaling the view we care about
-    const result = { x: touch.pageX, y: touch.pageY };
-    if (result.x === null) result.x = 0;
-    if (result.y === null) result.y = 0;
-    return result;
   }
 }
 

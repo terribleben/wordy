@@ -12,6 +12,8 @@ import Analysis from '../util/Analysis';
 import * as Api from '../api/Api';
 import Books from '../util/Books';
 import Cloud from '../components/Cloud';
+import Constants from '../util/Constants';
+import PinchZoom from '../components/PinchZoom';
 import SettingsButtons from '../components/SettingsButtons';
 
 class MainScreen extends React.Component {
@@ -19,9 +21,9 @@ class MainScreen extends React.Component {
     words: {},
     isLoading: true,
     dateLastLoaded: 0,
+    scale: Constants.CLOUD_INITIAL_SCALE,
+    pan: { x: 0, y: 0 },
   };
-
-  _mounted = false;
 
   componentDidMount() {
     this._mounted = true;
@@ -46,11 +48,15 @@ class MainScreen extends React.Component {
         </View>
       );
     }
+    // to enable gestures, wrap Cloud in
+    // <PinchZoom onUpdate={this._onUpdateGesture}>
     return (
       <View style={styles.cloudContainer}>
         <Cloud
           words={this.state.words}
           dateLoaded={this.state.dateLastLoaded}
+          pan={this.state.pan}
+          scale={this.state.scale}
           width={Dimensions.get('window').width - 32}
           height={Dimensions.get('window').height - 32} />
         <SettingsButtons
@@ -61,10 +67,18 @@ class MainScreen extends React.Component {
     );
   }
 
+  _onUpdateGesture = (gesture) => {
+    this.setState(gesture);
+  }
+
   _onPressReload = () => {
     if (Object.keys(this.state.words).length) {
       // we already have a model, just regenerate the cloud
-      this.setState({ dateLastLoaded: Date.now() });
+      this.setState({
+        scale: Constants.CLOUD_INITIAL_SCALE,
+        pan: { x: 0, y: 0 },
+        dateLastLoaded: Date.now(),
+      });
     } else {
       // need to download
       this._makeWordsFromWebsiteAsync(this.props.url);
@@ -91,6 +105,8 @@ class MainScreen extends React.Component {
         isLoading: false,
         dateLastLoaded: Date.now(),
         words,
+        scale: Constants.CLOUD_INITIAL_SCALE,
+        pan: { x: 0, y: 0 },
       });
     }
   }
