@@ -34,14 +34,14 @@ export default class CloudWord extends React.Component {
   }
   
   render() {
-    const { center, box, scale } = this.props;
+    const { center, box, scale, pan } = this.props;
     
     // vector from [center to box.origin]
     // scaled * scale
     // vector from screen origin to there
     const scaledBoxFromCenter = {
-      x: ((box.x - center.x) * scale) + center.x,
-      y: ((box.y - center.y) * scale) + center.y,
+      x: ((box.x - center.x) * scale) + center.x + pan.x,
+      y: ((box.y - center.y) * scale) + center.y + pan.y,
       width: box.width * scale,
       height: box.height * scale,
     };

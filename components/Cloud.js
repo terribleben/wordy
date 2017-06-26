@@ -70,11 +70,7 @@ export default class Cloud extends React.Component {
       <View
         style={[
           styles.cloudContainer,
-          {
-            width,
-            height,
-            transform: [{ translateX: this.state.pan.x }, { translateY: this.state.pan.y }],
-          },
+          { width, height },
         ]}
         {...responders}>
         {Object.keys(words).map((word) => {
@@ -88,6 +84,7 @@ export default class Cloud extends React.Component {
               box={cloudData[word].box}
               center={center}
               scale={this.state.scale}
+              pan={this.state.pan}
               animation={{delay: ii * 5, duration: 500 + (ii * 5)}}
               key={word}
               value={word} />
@@ -259,17 +256,7 @@ export default class Cloud extends React.Component {
   }
 
   _handlePan = (touchA, maybeTouchB, isGestureStart) => {
-    let center;
-    const locA = this._touchLocation(touchA);
-    if (maybeTouchB) {
-      const locB = this._touchLocation(maybeTouchB);
-      center = {
-        x: (locA.x + locB.x) * 0.5,
-        y: (locA.y + locB.y) * 0.5,
-      };
-    } else {
-      center = locA;
-    }
+    const center = this._touchLocation(touchA);
     if (isGestureStart) {
       this._initialPanGestureLocation = center;
       this._initialPan = this.state.pan;
