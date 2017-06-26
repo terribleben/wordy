@@ -44,7 +44,7 @@ export default class Cloud extends React.Component {
     this._resetAsync(nextProps.words);
   }
 
-  render () {
+  render() {
     let { loading } = this.state;
     if (loading) {
       return (<ActivityIndicator loading={true} />);
@@ -109,7 +109,7 @@ export default class Cloud extends React.Component {
     let words = Object.keys(wordsMapping);
 
     // compute weights
-    let weights = this._computeWeights(words, wordsMapping);
+    let weights = computeLogarithmicWeights(words, wordsMapping, 125);
 
     // compute styles
     let bounds = [];
@@ -139,10 +139,6 @@ export default class Cloud extends React.Component {
     
     this.setState({ cloud });
     return;
-  }
-
-  _computeWeights = (words, frequencies) => {
-    return computeLogarithmicWeights(words, frequencies, 125);
   }
 
   _computeFontSize = (word, weight) => {
@@ -206,7 +202,7 @@ export default class Cloud extends React.Component {
   }
 
   _boxIsOutsideBounds = (candidateBox) => {
-    const buffer = 0;
+    const buffer = 32;
     if (candidateBox.x < -buffer) return true;
     if (candidateBox.x + candidateBox.width > this.props.width + buffer) return true;
     if (candidateBox.y < -buffer) return true;

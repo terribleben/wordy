@@ -3,7 +3,7 @@ import { createStore } from 'redux';
 import Books from '../util/Books';
 
 const initialState = {
-  url: Books.metamorphosis.url,
+  url: Books.alice.url,
 };
 
 const reduce = (state, action) => {
