@@ -1,4 +1,10 @@
 
+function distance(pA, pB) {
+  return Math.sqrt(
+    Math.pow(pB.x - pA.x, 2.0) + Math.pow(pB.y - pA.y, 2.0)
+  );
+}
+
 function _getMinMaxVectors(box) {
   return {
     min: { x: box.x, y: box.y },
@@ -65,4 +71,5 @@ export {
   boxesIntersect,
   boxIntersectsBoxes,
   computeRandomAdjacentBox,
+  distance,
 };

@@ -2,14 +2,16 @@ import React from 'react';
 import {
   ActivityIndicator,
   Dimensions,
-  View,
+  Platform,
   StyleSheet,
+  View,
 } from 'react-native';
 
 import CloudWord from './CloudWord';
 import * as Colors from '../util/Colors';
 
 import {
+  distance,
   boxesIntersect,
   boxIntersectsBoxes,
   computeRandomAdjacentBox,
@@ -24,6 +26,7 @@ export default class Cloud extends React.Component {
   state = {
     cloud: {},
     loading: true,
+    scale: 1.0,
   };
 
   componentWillUnmount() {
@@ -54,12 +57,20 @@ export default class Cloud extends React.Component {
       x: (this.props.width * 0.5),
       y: (this.props.height * 0.5),
     };
+    const responders = {
+      onStartShouldSetResponder: this._onContainerStartShouldSetResponder,
+      onResponderGrant: this._onContainerResponderGrant,
+      onResponderMove: this._onContainerResponderMove,
+      onResponderRelease: this._onContainerResponderRelease,
+    };
     let ii = 0;
     return (
-      <View style={[
-              styles.cloudContainer,
-              { width, height }
-            ]}>
+      <View
+        style={[
+          styles.cloudContainer,
+          { width, height, transform: [{ scale: this.state.scale }] }
+        ]}
+        {...responders}>
         {Object.keys(words).map((word) => {
           if (!cloudData[word]) {
             return null;
@@ -193,6 +204,67 @@ export default class Cloud extends React.Component {
     if (candidateBox.y < -buffer) return true;
     if (candidateBox.y + candidateBox.height > this.props.height + buffer) return true;
     return false;
+  }
+
+  /* gesture responders */
+
+  _onContainerStartShouldSetResponder = () => true;
+
+  _onContainerResponderGrant = (event) => {
+    this._handleTouch(event);
+  }
+
+  _onContainerResponderMove = (event) => {
+    this._handleTouch(event);
+  }
+
+  _onContainerResponderRelease = (event) => {
+    this._handleRelease(event);
+  }
+
+  _handleTouch = (event) => {
+    let { nativeEvent } = event;
+    let touches = nativeEvent ? nativeEvent.touches : null;
+
+    this._hasTouch = true;
+    if (touches && touches.length) {
+      if (touches.length === 2) {
+        const isGestureStart = !this._hasDoubleTouch;
+        const touchA = touches[0], touchB = touches[1];
+        this._hasDoubleTouch = true;
+        this._handlePinchZoom(touchA, touchB, isGestureStart);
+      } else {
+        this._hasDoubleTouch = false;
+      }
+    }
+  }
+
+  _handleRelease = (event) => {
+    this._hasTouch = false;
+    this._hasDoubleTouch = false;
+  }
+
+  _handlePinchZoom = (touchA, touchB, isGestureStart) => {
+    const locA = this._touchLocation(touchA), locB = this._touchLocation(touchB);
+    const distanceAB = distance(locA, locB);
+    if (isGestureStart) {
+      this._initialGestureDistance = distanceAB;
+      this._initialGestureScale = this.state.scale;
+    } else {
+      const pinchRatio = distanceAB / this._initialGestureDistance;
+      const newScale = Math.max(0.5, Math.min(2.0, pinchRatio * this._initialGestureScale));
+      if (newScale) {
+        this.setState({ scale: newScale });
+      }
+    }
+  }
+
+  _touchLocation = (touch) => {
+    // use pageX rather than locationX because we are scaling the view we care about
+    const result = { x: touch.pageX, y: touch.pageY };
+    if (result.x === null) result.x = 0;
+    if (result.y === null) result.y = 0;
+    return result;
   }
 }
 
