@@ -28,6 +28,7 @@ export default class Cloud extends React.Component {
     cloud: {},
     loading: true,
     scale: 0.5,
+    pan: { x: 0, y: 0 },
   };
 
   componentWillUnmount() {
@@ -69,7 +70,11 @@ export default class Cloud extends React.Component {
       <View
         style={[
           styles.cloudContainer,
-          { width, height }
+          {
+            width,
+            height,
+            transform: [{ translateX: this.state.pan.x }, { translateY: this.state.pan.y }],
+          },
         ]}
         {...responders}>
         {Object.keys(words).map((word) => {
@@ -264,6 +269,21 @@ export default class Cloud extends React.Component {
       };
     } else {
       center = locA;
+    }
+    if (isGestureStart) {
+      this._initialPanGestureLocation = center;
+      this._initialPan = this.state.pan;
+    } else {
+      const delta = {
+        x: center.x - this._initialPanGestureLocation.x,
+        y: center.y - this._initialPanGestureLocation.y,
+      };
+      this.setState({
+        pan: {
+          x: this._initialPan.x + delta.x,
+          y: this._initialPan.y + delta.y,
+        }
+      });
     }
   }
 
