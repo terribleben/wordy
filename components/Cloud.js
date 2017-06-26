@@ -27,7 +27,7 @@ export default class Cloud extends React.Component {
   state = {
     cloud: {},
     loading: true,
-    scale: 0.5,
+    scale: Constants.CLOUD_INITIAL_SCALE,
     pan: { x: 0, y: 0 },
   };
 
@@ -100,7 +100,11 @@ export default class Cloud extends React.Component {
     }
     await this._computeCloudAsync(words);
     if (this._mounted) {
-      this.setState({ loading: false });
+      this.setState({
+        scale: Constants.CLOUD_INITIAL_SCALE,
+        pan: { x: 0, y: 0 },
+        loading: false,
+      });
     }
   }
 
