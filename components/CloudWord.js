@@ -7,8 +7,7 @@ import {
   View,
 } from 'react-native';
 
-const FONT_ALMOST_TOO_SMALL = 8.0;
-const FONT_TOO_SMALL = 6.0;
+import Constants from '../util/Constants';
 
 export default class CloudWord extends React.Component {
   state = {
@@ -59,11 +58,12 @@ export default class CloudWord extends React.Component {
     // disappear if too small
     let maxOpacity = 1.0;
     const scaledFontSize = this.props.style.fontSize * scale;
-    if (scaledFontSize <= FONT_TOO_SMALL) {
+    const { FONT_SIZE_TOO_SMALL, FONT_SIZE_ALMOST_TOO_SMALL } = Constants;
+    if (scaledFontSize <= FONT_SIZE_TOO_SMALL) {
       return null;
-    } else if (scaledFontSize <= FONT_ALMOST_TOO_SMALL) {
+    } else if (scaledFontSize <= FONT_SIZE_ALMOST_TOO_SMALL) {
       // nearly too small, fade out
-      maxOpacity = (scaledFontSize - FONT_TOO_SMALL) / (FONT_ALMOST_TOO_SMALL - FONT_TOO_SMALL);
+      maxOpacity = (scaledFontSize - FONT_SIZE_TOO_SMALL) / (FONT_SIZE_ALMOST_TOO_SMALL - FONT_SIZE_TOO_SMALL);
     }
     const opacity = this.state.transitionIn.interpolate({
       inputRange: [0, 1],

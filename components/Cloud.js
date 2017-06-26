@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 
 import CloudWord from './CloudWord';
+import Constants from '../util/Constants';
 import * as Colors from '../util/Colors';
 
 import {
@@ -18,7 +19,7 @@ import {
 } from '../util/Geometry';
 
 import {
-  computeTopNWeights,
+  computeLogarithmicWeights,
 } from '../util/Weights';
 
 export default class Cloud extends React.Component {
@@ -26,7 +27,7 @@ export default class Cloud extends React.Component {
   state = {
     cloud: {},
     loading: true,
-    scale: 0.7,
+    scale: 0.5,
   };
 
   componentWillUnmount() {
@@ -110,6 +111,7 @@ export default class Cloud extends React.Component {
 
     // compute styles
     let bounds = [];
+    const minFontSize = Constants.FONT_SIZE_TOO_SMALL / Constants.CLOUD_SCALE_MAX;
     const weakColor = { r: 128, g: 128, b: 128, a: 1.0 },
       strongColor = { r: 0, g: 0, b: 0, a: 1.0 };
     words.forEach((word) => {
@@ -127,7 +129,10 @@ export default class Cloud extends React.Component {
         },
         box,
       };
-      cloud[word] = data;
+      // skip stuff too small to show up
+      if (data.style.fontSize > minFontSize) {
+        cloud[word] = data;
+      }
     });
     
     this.setState({ cloud });
@@ -135,11 +140,11 @@ export default class Cloud extends React.Component {
   }
 
   _computeWeights = (words, frequencies) => {
-    return computeTopNWeights(words, frequencies, 10, 50);
+    return computeLogarithmicWeights(words, frequencies, 125);
   }
 
   _computeFontSize = (word, weight) => {
-    const minFontSize = 4, maxFontSize = 64;
+    const minFontSize = 0.5, maxFontSize = 64;
     return minFontSize + ((maxFontSize - minFontSize) * weight);
   }
 
@@ -183,7 +188,7 @@ export default class Cloud extends React.Component {
         height,
       };
     } else {
-      let numTries = 0, maxNumTries = 100;
+      let numTries = 0, maxNumTries = 150;
       let candidateBox;
       while (numTries++ < maxNumTries) {
         // randomly pick something adjacent to an existing bounding box
@@ -227,22 +232,39 @@ export default class Cloud extends React.Component {
     let { nativeEvent } = event;
     let touches = nativeEvent ? nativeEvent.touches : null;
 
-    this._hasTouch = true;
     if (touches && touches.length) {
+      const isPanGestureStart = !this._hasTouch;
+      this._hasTouch = true;
+      let touchA = touches[0], touchB = null;
       if (touches.length === 2) {
-        const isGestureStart = !this._hasDoubleTouch;
-        const touchA = touches[0], touchB = touches[1];
+        const isPinchGestureStart = !this._hasDoubleTouch;
+        touchB = touches[1];
         this._hasDoubleTouch = true;
-        this._handlePinchZoom(touchA, touchB, isGestureStart);
+        this._handlePinchZoom(touchA, touchB, isPinchGestureStart);
       } else {
         this._hasDoubleTouch = false;
       }
+      this._handlePan(touchA, touchB, isPanGestureStart);
     }
   }
 
   _handleRelease = (event) => {
     this._hasTouch = false;
     this._hasDoubleTouch = false;
+  }
+
+  _handlePan = (touchA, maybeTouchB, isGestureStart) => {
+    let center;
+    const locA = this._touchLocation(touchA);
+    if (maybeTouchB) {
+      const locB = this._touchLocation(maybeTouchB);
+      center = {
+        x: (locA.x + locB.x) * 0.5,
+        y: (locA.y + locB.y) * 0.5,
+      };
+    } else {
+      center = locA;
+    }
   }
 
   _handlePinchZoom = (touchA, touchB, isGestureStart) => {
@@ -253,7 +275,7 @@ export default class Cloud extends React.Component {
       this._initialGestureScale = this.state.scale;
     } else {
       const pinchRatio = distanceAB / this._initialGestureDistance;
-      const newScale = Math.max(0.5, Math.min(2.0, pinchRatio * this._initialGestureScale));
+      const newScale = Math.max(Constants.CLOUD_SCALE_MIN, Math.min(Constants.CLOUD_SCALE_MAX, pinchRatio * this._initialGestureScale));
       if (newScale) {
         this.setState({ scale: newScale });
       }
